@@ -10,8 +10,11 @@ import resourcesdata from "./data/resourcesdata";
 function App() {
     const [outposts, setOutposts] = useState([]);
     const [results, setResults] = useState([]);
-    const [considerLinkingResources, _setConsiderLinkingResources] = useState(false);  // prefixed with underscore
-
+    const [considerLinkingResources, setConsiderLinkingResources] = useState(false);
+    const yourResourcesArray = Object.keys(resourcesdata).map(key => ({
+        id: key,
+        name: resourcesdata[key].name,
+    }));
     const handleResourceChange = (outpostId, resourceName, isChecked) => {
         setOutposts(prev => prev.map(outpost => {
             if (outpost.id === outpostId) {
@@ -23,7 +26,24 @@ function App() {
             return outpost;
         }));
     };
+    const handleCalculate = () => {
+        // Check if outposts is not empty
+        if (outposts.length === 0) {
+            alert("No outposts available for calculation.");
+            return;
+        }
 
+        // Check if each outpost object has an 'id' property
+        for (let i = 0; i < outposts.length; i++) {
+            if (!outposts[i].hasOwnProperty('id')) {
+                alert(`Outpost at index ${i} does not have an 'id' property.`);
+                return;
+            }
+        }
+
+        // If validations pass, proceed with calculation
+        calculate(outposts, considerLinkingResources, setResults);
+    };
     const handleNameChange = (outpostId, newName) => {
         setOutposts(prev => prev.map(outpost => {
             if (outpost.id === outpostId) {
@@ -37,8 +57,16 @@ function App() {
         <div className="App">
             <Controls
                 onAddOutpost={() => addOutpost(outposts, setOutposts)}
-                onCalculate={() => calculate(outposts, considerLinkingResources, setResults)}
+                onCalculate={handleCalculate}
             />
+            <label>
+                <input
+                    type="checkbox"
+                    checked={considerLinkingResources}
+                    onChange={() => setConsiderLinkingResources(prev => !prev)}
+                />
+                Consider Linking Resources
+            </label>
             {outposts.map(outpost => (
                 <Outpost
                     key={outpost.id}
@@ -52,13 +80,14 @@ function App() {
                     {/* Embed the ResourceToggle component within each Outpost component */}
                     <ResourceToggle
                         outpostId={outpost.id}  // added outpostId prop
+                        resources={yourResourcesArray}
                         onResourceChange={(resourceName, isChecked) => handleResourceChange(outpost.id, resourceName, isChecked)}  // added onResourceChange prop
                     />
                 </Outpost>
             ))}
             <Results results={results} />  {/* updated prop name to results */}
             {/* Optional: Render the ResourceList component if you have a use for it */}
-            <ResourceList resources={{}} />  {/* assuming resources is an object */}
+            <ResourceList resources={[]} />  {/* assuming resources is an array */}
         </div>
     );
 }

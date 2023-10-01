@@ -1,17 +1,22 @@
-import Good from '../Models/good';
-import  resources from './resourcesdata';
+import * as Resources from '../Constants/resources';
+import * as Goods from '../Constants/goods';
 
+
+function createGood(name, components) {
+    return {
+        name,
+        components,
+    };
+}
 const goods = {
-    'Isocentered Magnet' : new Good('Isocentered Magnet', [resources['Cu (Copper)'], resources['Co (Cobalt)']]),
-    'Tau Grade Rheostat': new Good('Tau Grade Rheostat', [resources['Cu (Copper)'], resources['Be (Beryllium)']]),
-    'Austenitic Manifold': new Good('Austenitic Manifold', [resources['Ni (Nickel)'], resources['Fe (Iron)']]),
-    'Isotopic Coolant': new Good('Isotopic Coolant', [resources['IL (Ionic Liquids)'], resources['xF4 (Tetrafluorides)']]),
-    'Mag Pressure Tank': new Good('Mag Pressure Tank', [resources['Ni (Nickel)'], resources['Al (Aluminum)']]),
-    'Reactive Gauge': new Good('Reactive Gauge', [resources['Al (Aluminum)'], resources['Cu (Copper)']]),
-    'Zero Wire': new Good('Zero Wire', [resources['Ag (Silver)'], resources['Cu (Copper)']])
+    [Goods.ISOCENTERED_MAGNET]: createGood(Goods.ISOCENTERED_MAGNET, [Resources.COPPER, Resources.COBALT]),
+    [Goods.TAU_GRADE_RHEOSTAT]: createGood(Goods.TAU_GRADE_RHEOSTAT, [Resources.COPPER, Resources.BERYLLIUM]),
+    [Goods.AUSTENITIC_MANIFOLD]: createGood(Goods.AUSTENITIC_MANIFOLD, [Resources.NICKEL, Resources.IRON]),
+    [Goods.ISOTOPIC_COOLANT]: createGood(Goods.ISOTOPIC_COOLANT, [Resources.IONIC_LIQUIDS, Resources.TETRAFLUORIDES]),
+    [Goods.MAG_PRESSURE_TANK]: createGood(Goods.MAG_PRESSURE_TANK, [Resources.NICKEL, Resources.ALUMINUM]),
+    [Goods.REACTIVE_GAUGE]: createGood(Goods.REACTIVE_GAUGE, [Resources.ALUMINUM, Resources.COPPER]),
+    [Goods.ZERO_WIRE]: createGood(Goods.ZERO_WIRE, [Resources.SILVER, Resources.COPPER]),
+    [Goods.COMM_RELAY]: createGood(Goods.COMM_RELAY, [Goods.ISOCENTERED_MAGNET, Goods.TAU_GRADE_RHEOSTAT]),
+    [Goods.MONOPROPELLANT]: createGood(Goods.MONOPROPELLANT, [Goods.MAG_PRESSURE_TANK, Resources.ALKANES]),
 };
-
-goods['Comm Relay'] = new Good('Comm Relay', [goods['Isocentered Magnet'], goods['Tau Grade Rheostat']]);
-goods['Monopropellant'] = new Good('Monopropellant', [goods['Mag Pressure Tank'], resources['HnCn (Alkanes)']]);
-
 export default goods;

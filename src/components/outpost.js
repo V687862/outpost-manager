@@ -39,7 +39,7 @@ function Outpost({ id, name, onResourceChange, onNameChange, considerLinkingReso
                                 type="checkbox"
                                 id={`${resourceKey}-outpost${id}`}
                                 onChange={(e) => onResourceChange(id, resourceKey, e.target.checked)}
-                                value={/* value from your state */}
+                                value={resourceKey}
                             />
                             <label htmlFor={`${resourceKey}-outpost${id}-linking`}>{resources[resourceKey].name}</label>
                         </div>

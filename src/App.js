@@ -1,30 +1,26 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {addOutpost, removeOutpost, updateOutpostName, updateResource} from './redux/actions'; // Import your Redux actions
 import Outpost from './components/outpost';
 import ResourceToggle from './components/resourcetoggle';
 import ResourceList from './components/resourcelist';
 import Controls from './components/controls';
 import Results from './components/results';
-import { addOutpost, removeOutpost, calculate } from './Utilities/outpostutils';
 import resourcesdata from "./data/resourcesdata";
+import {calculate} from "./Utilities/outpostutils";
 
 function App() {
-    const [outposts, setOutposts] = useState([]);
+    const outposts = useSelector((state) => state.outposts);
+    const considerLinkingResources = useSelector((state) => state.considerLinkingResources);
+    const dispatch = useDispatch();
     const [results, setResults] = useState([]);
-    const [considerLinkingResources, setConsiderLinkingResources] = useState(false);
+
     const yourResourcesArray = Object.keys(resourcesdata).map(key => ({
         id: key,
         name: resourcesdata[key].name,
     }));
     const handleResourceChange = (outpostId, resourceName, isChecked) => {
-        setOutposts(prev => prev.map(outpost => {
-            if (outpost.id === outpostId) {
-                const updatedResources = isChecked ?
-                    [...outpost.resources, resourceName] :
-                    outpost.resources.filter(resource => resource !== resourceName);
-                return { ...outpost, resources: updatedResources };
-            }
-            return outpost;
-        }));
+        dispatch(updateResource(outpostId, resourceName, isChecked));
     };
     const handleCalculate = () => {
         // Check if outposts is not empty
@@ -45,13 +41,9 @@ function App() {
         calculate(outposts, considerLinkingResources, setResults);
     };
     const handleNameChange = (outpostId, newName) => {
-        setOutposts(prev => prev.map(outpost => {
-            if (outpost.id === outpostId) {
-                return { ...outpost, name: newName };
-            }
-            return outpost;
-        }));
+        dispatch(updateOutpostName(outpostId, newName)); // Dispatch the action
     };
+
 
     return (
         <div className="App">
@@ -85,9 +77,9 @@ function App() {
                     />
                 </Outpost>
             ))}
-            <Results results={results} />  {/* updated prop name to results */}
+            <Results results={results}/> {/* updated prop name to results */}
             {/* Optional: Render the ResourceList component if you have a use for it */}
-            <ResourceList resources={[]} />  {/* assuming resources is an array */}
+            <ResourceList resources={[]}/> {/* assuming resources is an array */}
         </div>
     );
 }

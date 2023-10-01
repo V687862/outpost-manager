@@ -1,5 +1,11 @@
 import goods from "../data/goodsdata";
-import { canProduceGood, getProducableGoods, unusedResources, formatGoodNames, formatResourceList } from "./resourceutils";
+import {
+    canProduceGood,
+    formatGoodNames,
+    formatResourceList,
+    getProducableGoods,
+    unusedResources
+} from "./resourceutils";
 
 const memo = {};
 
@@ -83,7 +89,11 @@ function findBestOutpostCombination(N, outposts) {
     };
 }
 function findBestComboForBase(i, N, outposts, previousOutposts) {
-    const baseOutpostResources = getOutpostResources(outposts[i].id);
+    if (!outposts || i >= outposts.length || i < 0) {
+        console.error('Invalid arguments:', outposts, i);
+        return;
+    }
+    const baseOutpostResources = getOutpostResources(outposts[i].id, outposts);
     let bestComboGoods = 0;
     let bestComboOutposts = [];
     let bestComboProducedGoods = [];

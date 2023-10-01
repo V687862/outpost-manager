@@ -5,7 +5,7 @@ const initialState = {
     outposts: [], // You should have this in your initial state
 };
 
-const outpostsReducer = (state = initialState, action) => {
+const resourceReducer = (state = initialState, action) => {
     switch (action.type) {
         case UPDATE_RESOURCE: {
             const {outpostId, resourceName, isChecked} = action.payload;
@@ -50,4 +50,4 @@ const outpostsReducer = (state = initialState, action) => {
     }
 };
 
-export default reducer;
+export default resourceReducer;

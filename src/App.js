@@ -48,7 +48,7 @@ function App() {
     return (
         <div className="App">
             <Controls
-                onAddOutpost={() => addOutpost(outposts, setOutposts)}
+                onAddOutpost={() => dispatch(addOutpost(/* Pass the outpost data here */))}
                 onCalculate={handleCalculate}
             />
             <label>
@@ -66,7 +66,7 @@ function App() {
                     name={outpost.name}
                     onResourceChange={handleResourceChange}
                     onNameChange={handleNameChange}
-                    onRemove={() => removeOutpost(outpost.id, outposts, setOutposts)}
+                    onRemove={() => dispatch(removeOutpost(outpost.id))}
                     considerLinkingResources={considerLinkingResources}
                 >
                     {/* Embed the ResourceToggle component within each Outpost component */}

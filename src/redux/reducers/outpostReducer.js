@@ -4,7 +4,7 @@ const initialState = {
     outposts: [],
     considerLinkingResources: false,
 };
-const outpostReducer = (state = initialState.outposts, action) => {
+const outpostReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_OUTPOST:
             // Handle adding an outpost to the state

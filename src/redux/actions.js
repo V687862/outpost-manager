@@ -25,3 +25,6 @@ export const updateOutpostName = (outpostId, newName) => {
         payload: {outpostId, newName},
     };
 };
+export const toggleConsiderLinkingResources = () => ({
+    type: TOGGLE_CONSIDER_LINKING_RESOURCES,
+});

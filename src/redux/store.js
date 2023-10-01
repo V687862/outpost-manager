@@ -2,12 +2,6 @@ import {combineReducers, createStore} from 'redux';
 import outpostReducer from "./reducers/outpostReducer";
 import resourceReducer from "./reducers/resourceReducer";
 
-// Define an initial state
-const initialState = {
-    outposts: [], // Your outposts state
-    considerLinkingResources: false,
-    // ...other states you may have
-};
 
 const rootReducer = combineReducers({
     outposts: outpostReducer,

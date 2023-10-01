@@ -1,16 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import store from './redux/store';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
 
-ReactDOM.render(
+const root = document.getElementById('root');
+
+// Using createRoot to enable Concurrent Mode
+const reactRoot = createRoot(root);
+reactRoot.render(
     <Provider store={store}>
         <App/>
-    </Provider>,
-    document.getElementById('root')
+    </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

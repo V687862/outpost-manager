@@ -1,6 +1,12 @@
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {addOutpost, removeOutpost, updateOutpostName, updateResource} from './redux/actions'; // Import your Redux actions
+import {
+    addOutpost,
+    removeOutpost,
+    toggleConsiderLinkingResources,
+    updateOutpostName,
+    updateResource
+} from './redux/actions'; // Import your Redux actions
 import Outpost from './components/outpost';
 import ResourceToggle from './components/resourcetoggle';
 import ResourceList from './components/resourcelist';
@@ -55,7 +61,7 @@ function App() {
                 <input
                     type="checkbox"
                     checked={considerLinkingResources}
-                    onChange={() => setConsiderLinkingResources(prev => !prev)}
+                    onChange={() => dispatch(toggleConsiderLinkingResources())}
                 />
                 Consider Linking Resources
             </label>

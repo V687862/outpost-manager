@@ -1,4 +1,4 @@
-import {UPDATE_OUTPOST_NAME, UPDATE_RESOURCE} from '../actiontypes';
+import {TOGGLE_CONSIDER_LINKING_RESOURCES, UPDATE_OUTPOST_NAME, UPDATE_RESOURCE} from '../actiontypes';
 
 const initialState = {
     // ... your other initial state properties
@@ -44,6 +44,11 @@ const resourceReducer = (state = initialState, action) => {
                 outposts: updatedNames,
             };
         }
+        case TOGGLE_CONSIDER_LINKING_RESOURCES:
+            return {
+                ...state,
+                considerLinkingResources: !state.considerLinkingResources,
+            };
 
         default:
             return state;

@@ -1,4 +1,4 @@
-import Good from '../good';
+import Good from '../Models/good';
 import  resources from './resourcesdata';
 
 const goods = {

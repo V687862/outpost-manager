@@ -1,5 +1,6 @@
 import React from 'react';
 import resources from '../data/resourcesdata';
+import PropTypes from "prop-types";
 
 function Outpost({ id, name, onResourceChange, onNameChange, considerLinkingResources,onRemove }) {
     // Divide resources into linking and manufacturing
@@ -36,8 +37,9 @@ function Outpost({ id, name, onResourceChange, onNameChange, considerLinkingReso
                         <div key={resourceKey}>
                             <input
                                 type="checkbox"
-                                id={`${resourceKey}-outpost${id}-linking`}
+                                id={`${resourceKey}-outpost${id}`}
                                 onChange={(e) => onResourceChange(id, resourceKey, e.target.checked)}
+                                value={/* value from your state */}
                             />
                             <label htmlFor={`${resourceKey}-outpost${id}-linking`}>{resources[resourceKey].name}</label>
                         </div>
@@ -49,6 +51,17 @@ function Outpost({ id, name, onResourceChange, onNameChange, considerLinkingReso
         </div>
     );
 }
-
+Outpost.propTypes = {
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string,
+    onResourceChange: PropTypes.func.isRequired,
+    onNameChange: PropTypes.func.isRequired,
+    considerLinkingResources: PropTypes.bool,
+    onRemove: PropTypes.func.isRequired,
+};
+Outpost.defaultProps = {
+    name: '',
+    considerLinkingResources: false,
+};
 export default Outpost;
 

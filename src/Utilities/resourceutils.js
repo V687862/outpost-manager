@@ -1,21 +1,6 @@
 import resources from "../data/resourcesdata";
 import goods from "../data/goodsdata";
 
-const canProduceGood = (outpostResources, good, considerLinkingResources) => {
-    return good.resources.every(resourceOrGood => {
-        const isResource = resources[resourceOrGood.name];
-        const isGood = goods[resourceOrGood.name];
-
-        if (isResource) {
-            return (considerLinkingResources || !resourceOrGood.isLinkResource) && outpostResources.includes(resourceOrGood.name);
-        } else if (isGood) {
-            return canProduceGood(outpostResources, goods[resourceOrGood.name]);
-        } else {
-            console.warn(`Unknown type for ${resourceOrGood.name}`);
-            return false;  // or handle this case as appropriate for your logic
-        }
-    });
-};
 
 const getProducableGoods = outpostResources => {
     return Object.values(goods).filter(good => canProduceGood(outpostResources, good));
@@ -55,4 +40,4 @@ function formatResourceList(outpost, considerLinkingResources) {
     return filteredResources.map(formatResourceString).join("\n");
 }
 
-export {canProduceGood, getProducableGoods, unusedResources, formatGoodNames, formatResourceList};
+export {getProducableGoods, unusedResources, formatGoodNames, formatResourceList};

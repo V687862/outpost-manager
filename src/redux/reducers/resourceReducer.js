@@ -1,8 +1,14 @@
-import {TOGGLE_CONSIDER_LINKING_RESOURCES, UPDATE_OUTPOST_NAME, UPDATE_RESOURCE} from '../actiontypes';
+import {
+    CAN_PRODUCE_GOOD,
+    TOGGLE_CONSIDER_LINKING_RESOURCES,
+    UPDATE_OUTPOST_NAME,
+    UPDATE_RESOURCE
+} from '../actiontypes';
 
 const initialState = {
     // ... your other initial state properties
-    outposts: [], // You should have this in your initial state
+    outposts: [],
+    canProduceGood: false,
 };
 
 const resourceReducer = (state = initialState, action) => {
@@ -49,7 +55,11 @@ const resourceReducer = (state = initialState, action) => {
                 ...state,
                 considerLinkingResources: !state.considerLinkingResources,
             };
-
+        case CAN_PRODUCE_GOOD:
+            return {
+                ...state,
+                canProduceGood: action.payload,
+            };
         default:
             return state;
     }

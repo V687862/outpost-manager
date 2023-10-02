@@ -1,17 +1,22 @@
 import {
     ADD_OUTPOST,
+    CAN_PRODUCE_GOOD,
     FIND_BEST_COMBO_FOR_BASE,
+    FIND_BEST_LINKED_COMBO,
     FIND_BEST_OUTPOST_COMBINATION,
     GET_OUTPOST_NAME,
     GET_OUTPOST_RESOURCES,
+    GET_PRODUCABLE_GOODS,
+    GET_UNUSED_RESOURCES,
     REMOVE_OUTPOST,
     SET_RESULTS,
     TOGGLE_CONSIDER_LINKING_RESOURCES,
     UPDATE_BEST_COMBO,
-    UPDATE_OUTPOST_NAME,
-    UPDATE_RESOURCE
+    UPDATE_OUTPOST_NAME
 } from './actiontypes';
-import {findBestLinkedCombo} from "../Utilities/outpostutils";
+import {memo} from "react";
+import resources from "../data/resourcesdata";
+import goods from "../data/goodsdata";
 
 export const addOutpost = (outpost) => ({
     type: ADD_OUTPOST,
@@ -22,13 +27,6 @@ export const removeOutpost = (outpostId) => ({
     type: REMOVE_OUTPOST,
     payload: outpostId,
 });
-
-export const updateResource = (outpostId, resourceName, isChecked) => {
-    return {
-        type: UPDATE_RESOURCE,
-        payload: {outpostId, resourceName, isChecked},
-    };
-};
 export const updateOutpostName = (outpostId, newName) => {
     return {
         type: UPDATE_OUTPOST_NAME,
@@ -38,6 +36,52 @@ export const updateOutpostName = (outpostId, newName) => {
 export const toggleConsiderLinkingResources = () => ({
     type: TOGGLE_CONSIDER_LINKING_RESOURCES,
 });
+export const canProduceGood = (outpostResources, good, considerLinkingResources) => {
+    return (dispatch) => {
+        const canProduce = good.resources.every(resourceOrGood => {
+            const isResource = resources[resourceOrGood.name];
+            const isGood = goods[resourceOrGood.name];
+
+            if (isResource) {
+                return (considerLinkingResources || !resourceOrGood.isLinkResource) && outpostResources.includes(resourceOrGood.name);
+            } else if (isGood) {
+                return canProduceGood(outpostResources, goods[resourceOrGood.name]);
+            } else {
+                console.warn(`Unknown type for ${resourceOrGood.name}`);
+                return false;  // or handle this case as appropriate for your logic
+            }
+        });
+
+        dispatch({
+            type: CAN_PRODUCE_GOOD,
+            payload: canProduce
+        });
+    };
+};
+export const getProducableGoods = (outpostResources) => {
+    return (dispatch) => {
+        const producableGoods = Object.values(goods).filter(good => canProduceGood(outpostResources, good));
+
+        dispatch({
+            type: GET_PRODUCABLE_GOODS,
+            payload: producableGoods
+        });
+    };
+};
+
+export const unusedResources = (outpostResources, producedGoods) => {
+    return (dispatch) => {
+        const unusedResources = outpostResources.filter(res => !producedGoods.some(good => good.resources.some(r => r.name === res)));
+
+        dispatch({
+            type: GET_UNUSED_RESOURCES,
+            payload: unusedResources
+        });
+    };
+};
+
+
+
 export const getOutpostName = (outpostId, outposts) => {
     return (dispatch) => {
         let outpostName = "Unknown";
@@ -148,4 +192,55 @@ export const findBestOutpostCombination = (N, outposts) => {
         });
     };
 };
+export const findBestLinkedCombo = (i, j, N, outposts, previousResources, previousOutposts) => {
+    return (dispatch) => {
+        // Your existing function logic here...
+        const memoKey = `${i}-${j}-${previousOutposts.join('-')}`;
+
+        if (memo[memoKey]) {
+            console.log(`Using memoized result for key ${memoKey}...`);
+            return memo[memoKey];
+        }
+
+        const producableGoods = getProducableGoods(previousResources);
+        let comboResources = unusedResources(previousResources, getProducableGoods(previousResources));
+
+        console.log(`Finding best linked combo for base outpost ${i} and linked outpost ${j}...`);
+
+        let bestComboGoods = producableGoods;
+        let bestComboOutposts = [outposts[j].id];
+        let bestComboProducedGoods = [producableGoods];
+        let bestComboUnusedResources = comboResources;
+
+        for (let k = j + 1; k < N; k++) {
+            if (k !== i && !previousOutposts.includes(k)) {
+                const result = findBestLinkedCombo(i, k, N, comboResources, [...previousOutposts, j]);
+                if (result.bestComboGoods > bestComboGoods) {
+                    bestComboGoods = result.bestComboGoods;
+                    bestComboOutposts = [outposts[k].id, ...result.bestComboOutposts];
+                    bestComboProducedGoods = [producableGoods, ...result.bestComboProducedGoods];
+                    bestComboUnusedResources = result.bestComboUnusedResources;
+                }
+            }
+        }
+
+        console.log(`Best linked combo for base outpost ${i} and linked outpost ${j}: Goods=${bestComboGoods}, Outposts=${bestComboOutposts.join(', ')}, Produced Goods=${bestComboProducedGoods.join(', ')}, Unused Resources=${bestComboUnusedResources.join(', ')}`);
+
+        memo[memoKey] = {bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources};
+
+        // Dispatch the action with the calculated values
+        dispatch({
+            type: FIND_BEST_LINKED_COMBO,
+            payload: {
+                bestComboGoods,
+                bestComboOutposts,
+                bestComboProducedGoods,
+                bestComboUnusedResources,
+            }
+        });
+
+        return {bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources};
+    };
+};
+
 

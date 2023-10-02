@@ -1,15 +1,6 @@
 import goods from "../data/goodsdata";
-import {
-    canProduceGood,
-    formatGoodNames,
-    formatResourceList,
-    getProducableGoods,
-    unusedResources
-} from "./resourceutils";
-import {setResults} from "../redux/actions";
-
-
-const memo = {};
+import {canProduceGood, formatGoodNames, formatResourceList} from "./resourceutils";
+import {findBestComboForBase, findBestOutpostCombination, setResults} from "../redux/actions";
 
 function getOutpostName(outpostId, outposts) {
     if (outpostId <= 0 || outpostId > outposts.length) return "Unknown";
@@ -47,65 +38,6 @@ function getBestComboForBase(i, N) {
 }
 
 // Function to update the best combo if the new combo is better
-function updateBestCombo(bestCombo, newCombo, outposts, i) {
-    const { bestComboGoods } = newCombo;
-
-    if (bestComboGoods > bestCombo.maxGoodsProduced) {
-        console.log(`Updated Best Base Outpost to ${outposts[i].id} with max goods of ${bestComboGoods}.`);
-        return {
-            maxGoodsProduced: bestComboGoods,
-            bestBaseOutpost: outposts[i].id,
-            bestLinkedOutposts: newCombo.bestComboOutposts,
-            bestProducedGoods: newCombo.bestComboProducedGoods,
-            bestUnusedResources: newCombo.bestComboUnusedResources
-        };
-    }
-
-    return bestCombo;
-}
-
-// Main function to find the best outpost combination
-
-
-
-function findBestLinkedCombo(i, j, N, outposts, previousResources, previousOutposts) {
-    const memoKey = `${i}-${j}-${previousOutposts.join('-')}`;
-
-    if (memo[memoKey]) {
-        console.log(`Using memoized result for key ${memoKey}...`);
-        return memo[memoKey];
-    }
-
-    const producableGoods = getProducableGoods(previousResources);
-    let comboResources = unusedResources(previousResources, getProducableGoods(previousResources));
-
-    console.log(`Finding best linked combo for base outpost ${i} and linked outpost ${j}...`);
-
-    let bestComboGoods = producableGoods;
-    let bestComboOutposts = [outposts[j].id];
-    let bestComboProducedGoods = [producableGoods];
-    let bestComboUnusedResources = comboResources;
-
-    for (let k = j + 1; k < N; k++) {
-        if (k !== i && !previousOutposts.includes(k)) {
-            const result = findBestLinkedCombo(i, k, N, comboResources, [...previousOutposts, j]);
-            if (result.bestComboGoods > bestComboGoods) {
-                bestComboGoods = result.bestComboGoods;
-                bestComboOutposts = [outposts[k].id, ...result.bestComboOutposts];
-                bestComboProducedGoods = [producableGoods, ...result.bestComboProducedGoods];
-                bestComboUnusedResources = result.bestComboUnusedResources;
-            }
-        }
-    }
-
-    console.log(`Best linked combo for base outpost ${i} and linked outpost ${j}: Goods=${bestComboGoods}, Outposts=${bestComboOutposts.join(', ')}, Produced Goods=${bestComboProducedGoods.join(', ')}, Unused Resources=${bestComboUnusedResources.join(', ')}`);
-
-    memo[memoKey] = { bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources };
-
-    return { bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources };
-}
-
-
 function formatOutpostResult(outpost) {
     const outpostResources = outpost.resources;
     const manufacturableGoods = Object.values(goods).filter(good => canProduceGood(outpostResources, good));
@@ -148,12 +80,9 @@ function formatFinalResult(outposts, bestBaseOutpost, bestLinkedOutposts, bestPr
 }
 
 export {
-    getOutpostResources,
     getOutpostName,
     getBestComboForBase,
-    updateBestCombo,
     findBestOutpostCombination,
-    findBestLinkedCombo,
     formatOutpostResult,
     formatFinalResult
 };

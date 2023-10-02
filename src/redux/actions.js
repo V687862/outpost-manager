@@ -1,8 +1,10 @@
 import {
+    ADD_OUTPOST,
     FIND_BEST_COMBO_FOR_BASE,
     FIND_BEST_OUTPOST_COMBINATION,
     GET_OUTPOST_NAME,
     GET_OUTPOST_RESOURCES,
+    REMOVE_OUTPOST,
     SET_RESULTS,
     TOGGLE_CONSIDER_LINKING_RESOURCES,
     UPDATE_BEST_COMBO,
@@ -12,12 +14,12 @@ import {
 import {findBestLinkedCombo} from "../Utilities/outpostutils";
 
 export const addOutpost = (outpost) => ({
-    type: 'ADD_OUTPOST',
+    type: ADD_OUTPOST,
     payload: outpost,
 });
 
 export const removeOutpost = (outpostId) => ({
-    type: 'REMOVE_OUTPOST',
+    type: REMOVE_OUTPOST,
     payload: outpostId,
 });
 

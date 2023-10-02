@@ -1,15 +1,6 @@
 import resources from "../data/resourcesdata";
 import goods from "../data/goodsdata";
 
-const handleResourceToggle = (outpostId, resourceName, setOutposts) => {
-    setOutposts(prev => prev.map(outpost => {
-        if (outpost.id === outpostId) {
-            const updatedResources = outpost.resources.includes(resourceName) ? outpost.resources.filter(r => r !== resourceName) : [...outpost.resources, resourceName];
-            return { ...outpost, resources: updatedResources };
-        }
-        return outpost;
-    }));
-};
 const canProduceGood = (outpostResources, good, considerLinkingResources) => {
     return good.resources.every(resourceOrGood => {
         const isResource = resources[resourceOrGood.name];
@@ -64,4 +55,4 @@ function formatResourceList(outpost, considerLinkingResources) {
     return filteredResources.map(formatResourceString).join("\n");
 }
 
-export { handleResourceToggle, canProduceGood, getProducableGoods, unusedResources, formatGoodNames, formatResourceList };
+export {canProduceGood, getProducableGoods, unusedResources, formatGoodNames, formatResourceList};

@@ -1,8 +1,21 @@
-import {ADD_OUTPOST, REMOVE_OUTPOST, TOGGLE_LINKING_RESOURCES} from "../actiontypes";
+import {
+    ADD_OUTPOST,
+    FIND_BEST_OUTPOST_COMBINATION,
+    GET_OUTPOST_NAME,
+    GET_OUTPOST_RESOURCES,
+    REMOVE_OUTPOST,
+    TOGGLE_LINKING_RESOURCES
+} from "../actiontypes";
 
 const initialState = {
     outposts: [],
     considerLinkingResources: false,
+    outpostResources: [],
+    outpostName: "",
+    bestComboGoods: 0,
+    bestComboOutposts: [],
+    bestComboProducedGoods: [],
+    bestComboUnusedResources: []
 };
 const outpostReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -24,6 +37,25 @@ const outpostReducer = (state = initialState, action) => {
                 ...state,
                 considerLinkingResources: !state.considerLinkingResources,
             };
+        case GET_OUTPOST_NAME:
+            return {
+                ...state,
+                outpostName: action.payload
+            };
+        case GET_OUTPOST_RESOURCES:
+            return {
+                ...state,
+                outpostResources: action.payload
+            };
+        case FIND_BEST_OUTPOST_COMBINATION:
+            return {
+                ...state,
+                bestBaseOutpost: action.payload.bestBaseOutpost,
+                bestLinkedOutposts: action.payload.bestLinkedOutposts,
+                bestProducedGoods: action.payload.bestProducedGoods,
+                bestUnusedResources: action.payload.bestUnusedResources
+            };
+
         // ...other cases for different actions
         default:
             return state;

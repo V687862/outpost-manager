@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {useSelector} from "react-redux";
 
-function Results({ results }) {
+const Results = () => {
+    const results = useSelector(state => state.results);
     return (
         <div className="results">
             <h2>Results</h2>

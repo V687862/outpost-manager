@@ -6,42 +6,41 @@ import {
     getProducableGoods,
     unusedResources
 } from "./resourceutils";
+import {setResults} from "../redux/actions";
+
 
 const memo = {};
 
-
-function addOutpost(outposts, setOutposts) {
-    setOutposts(prev => [...prev, { id: prev.length + 1, name: '', resources: [] }]);
-}
-
-function removeOutpost(outpostId, outposts, setOutposts) {
-    setOutposts(prev => prev.filter(o => o.id !== outpostId));
-}
-function getOutpostResources(outpostId, outposts) {
-    const outpost = outposts.find(o => o.id === outpostId);
-    return outpost ? outpost.resources : [];
-}
 function getOutpostName(outpostId, outposts) {
     if (outpostId <= 0 || outpostId > outposts.length) return "Unknown";
     const outpost = outposts[outpostId - 1];
     return outpost ? (outpost.name || `Outpost ${outpostId}`) : "Unknown";
 }
-function calculate(outposts, considerLinkingResources, setResults) {
-    const N = outposts.length;
-    const { bestBaseOutpost, bestLinkedOutposts, bestProducedGoods, bestUnusedResources } = findBestOutpostCombination(N);
 
-    const newResults = outposts.map(outpost => formatOutpostResult(outpost));
+export const calculateThunk = (outposts, considerLinkingResources) => {
+    return (dispatch, getState) => {
+        const N = outposts.length;
+        const {
+            bestBaseOutpost,
+            bestLinkedOutposts,
+            bestProducedGoods,
+            bestUnusedResources
+        } = findBestOutpostCombination(N);
 
-    const finalResult = formatFinalResult(
-        bestBaseOutpost,
-        bestLinkedOutposts,
-        bestProducedGoods,
-        bestUnusedResources,
-        considerLinkingResources
-    );
+        const newResults = outposts.map(outpost => formatOutpostResult(outpost));
 
-    setResults([...newResults, ...finalResult]);
-}
+        const finalResult = formatFinalResult(
+            bestBaseOutpost,
+            bestLinkedOutposts,
+            bestProducedGoods,
+            bestUnusedResources,
+            considerLinkingResources
+        );
+
+        // Dispatching the synchronous action to update the state
+        dispatch(setResults([...newResults, ...finalResult]));
+    };
+};
 
 function getBestComboForBase(i, N) {
     return findBestComboForBase(i, N, []);
@@ -66,57 +65,8 @@ function updateBestCombo(bestCombo, newCombo, outposts, i) {
 }
 
 // Main function to find the best outpost combination
-function findBestOutpostCombination(N, outposts) {
-    let bestCombo = {
-        maxGoodsProduced: 0,
-        bestBaseOutpost: 0,
-        bestLinkedOutposts: [],
-        bestProducedGoods: [],
-        bestUnusedResources: []
-    };
 
-    for (let i = 0; i < N; i++) {
-        const newCombo = getBestComboForBase(i, N);
-        console.log(`For outpost ${i}: Best Combo Goods: ${newCombo.bestComboGoods}, Best Combo Outposts: ${newCombo.bestComboOutposts.join(', ')}, Best Combo Produced Goods: ${newCombo.bestComboProducedGoods.join(', ')}, Best Combo Unused Resources: ${newCombo.bestComboUnusedResources.join(', ')}`);
-        bestCombo = updateBestCombo(bestCombo, newCombo, outposts, i);
-    }
 
-    return {
-        bestBaseOutpost: bestCombo.bestBaseOutpost,
-        bestLinkedOutposts: bestCombo.bestLinkedOutposts,
-        bestProducedGoods: bestCombo.bestProducedGoods,
-        bestUnusedResources: bestCombo.bestUnusedResources
-    };
-}
-function findBestComboForBase(i, N, outposts, previousOutposts) {
-    if (!outposts || i >= outposts.length || i < 0) {
-        console.error('Invalid arguments:', outposts, i);
-        return;
-    }
-    const baseOutpostResources = getOutpostResources(outposts[i].id, outposts);
-    let bestComboGoods = 0;
-    let bestComboOutposts = [];
-    let bestComboProducedGoods = [];
-    let bestComboUnusedResources = [];
-
-    console.log(`Finding best combo for base outpost ${i}...`);
-
-    for (let j = 0; j < N; j++) {
-        if (i !== j && !previousOutposts.includes(j)) {
-            const result = findBestLinkedCombo(i, j, N, baseOutpostResources, [i]);
-            if (result.bestComboGoods > bestComboGoods) {
-                bestComboGoods = result.bestComboGoods;
-                bestComboOutposts = result.bestComboOutposts;
-                bestComboProducedGoods = result.bestComboProducedGoods;
-                bestComboUnusedResources = result.bestComboUnusedResources;
-            }
-        }
-    }
-
-    console.log(`Best combo for base outpost ${i}: Goods=${bestComboGoods}, Outposts=${bestComboOutposts.join(', ')}, Produced Goods=${bestComboProducedGoods.join(', ')}, Unused Resources=${bestComboUnusedResources.join(', ')}`);
-
-    return { bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources };
-}
 
 function findBestLinkedCombo(i, j, N, outposts, previousResources, previousOutposts) {
     const memoKey = `${i}-${j}-${previousOutposts.join('-')}`;
@@ -197,4 +147,13 @@ function formatFinalResult(outposts, bestBaseOutpost, bestLinkedOutposts, bestPr
     return results;
 }
 
-export { addOutpost, removeOutpost, getOutpostResources, getOutpostName, calculate, getBestComboForBase, updateBestCombo, findBestOutpostCombination, findBestLinkedCombo, formatOutpostResult, formatFinalResult };
+export {
+    getOutpostResources,
+    getOutpostName,
+    getBestComboForBase,
+    updateBestCombo,
+    findBestOutpostCombination,
+    findBestLinkedCombo,
+    formatOutpostResult,
+    formatFinalResult
+};

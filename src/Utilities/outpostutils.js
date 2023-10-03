@@ -1,5 +1,5 @@
 import goods from "../data/goodsdata";
-import {canProduceGood, formatGoodNames, formatResourceList} from "./resourceutils";
+import {formatGoodNames, formatResourceList} from "./resourceutils";
 import {findBestComboForBase, findBestOutpostCombination, setResults} from "../redux/actions";
 
 function getOutpostName(outpostId, outposts) {
@@ -82,7 +82,6 @@ function formatFinalResult(outposts, bestBaseOutpost, bestLinkedOutposts, bestPr
 export {
     getOutpostName,
     getBestComboForBase,
-    findBestOutpostCombination,
     formatOutpostResult,
     formatFinalResult
 };

@@ -17,6 +17,7 @@ import {
 import {memo} from "react";
 import resources from "../data/resourcesdata";
 import goods from "../data/goodsdata";
+import {formatFinalResult, formatOutpostResult} from "../Utilities/outpostutils";
 
 export const addOutpost = (outpost) => ({
     type: ADD_OUTPOST,
@@ -47,7 +48,6 @@ export const canProduceGood = (outpostResources, good, considerLinkingResources)
             } else if (isGood) {
                 return canProduceGood(outpostResources, goods[resourceOrGood.name]);
             } else {
-                console.warn(`Unknown type for ${resourceOrGood.name}`);
                 return false;  // or handle this case as appropriate for your logic
             }
         });
@@ -61,7 +61,6 @@ export const canProduceGood = (outpostResources, good, considerLinkingResources)
 export const getProducableGoods = (outpostResources) => {
     return (dispatch) => {
         const producableGoods = Object.values(goods).filter(good => canProduceGood(outpostResources, good));
-
         dispatch({
             type: GET_PRODUCABLE_GOODS,
             payload: producableGoods
@@ -72,7 +71,6 @@ export const getProducableGoods = (outpostResources) => {
 export const unusedResources = (outpostResources, producedGoods) => {
     return (dispatch) => {
         const unusedResources = outpostResources.filter(res => !producedGoods.some(good => good.resources.some(r => r.name === res)));
-
         dispatch({
             type: GET_UNUSED_RESOURCES,
             payload: unusedResources
@@ -117,7 +115,6 @@ export const updateBestCombo = (bestCombo, newCombo, outposts, i) => {
         const {bestComboGoods} = newCombo;
 
         if (bestComboGoods > bestCombo.maxGoodsProduced) {
-            console.log(`Updated Best Base Outpost to ${outposts[i].id} with max goods of ${bestComboGoods}.`);
             dispatch({
                 type: UPDATE_BEST_COMBO,
                 payload: {
@@ -131,23 +128,24 @@ export const updateBestCombo = (bestCombo, newCombo, outposts, i) => {
         }
     };
 };
-export const findBestComboForBase = (i, N, outposts, previousOutposts) => {
-    return (dispatch) => {
+export const findBestComboForBase = (i, N, outposts) => {
+    return async (dispatch) => {
         if (!outposts || i >= outposts.length || i < 0) {
             console.error('Invalid arguments:', outposts, i);
             return;
         }
+
+        // Assuming getOutpostResources is a selector or utility function that retrieves resources
         const baseOutpostResources = getOutpostResources(outposts[i].id, outposts);
         let bestComboGoods = 0;
         let bestComboOutposts = [];
         let bestComboProducedGoods = [];
         let bestComboUnusedResources = [];
 
-        console.log(`Finding best combo for base outpost ${i}...`);
-
         for (let j = 0; j < N; j++) {
-            if (i !== j && !previousOutposts.includes(j)) {
-                const result = findBestLinkedCombo(i, j, N, baseOutpostResources, [i]);
+            if (i !== j) {
+                // Dispatching findBestLinkedCombo as an action
+                const result = await dispatch(findBestLinkedCombo(i, j, N, baseOutpostResources, [i]));
                 if (result.bestComboGoods > bestComboGoods) {
                     bestComboGoods = result.bestComboGoods;
                     bestComboOutposts = result.bestComboOutposts;
@@ -156,9 +154,6 @@ export const findBestComboForBase = (i, N, outposts, previousOutposts) => {
                 }
             }
         }
-
-        console.log(`Best combo for base outpost ${i}: Goods=${bestComboGoods}, Outposts=${bestComboOutposts.join(', ')}, Produced Goods=${bestComboProducedGoods.join(', ')}, Unused Resources=${bestComboUnusedResources.join(', ')}`);
-
         dispatch({
             type: FIND_BEST_COMBO_FOR_BASE,
             payload: {bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources}
@@ -166,7 +161,7 @@ export const findBestComboForBase = (i, N, outposts, previousOutposts) => {
     };
 };
 export const findBestOutpostCombination = (N, outposts) => {
-    return (dispatch) => {
+    return async (dispatch) => {
         let bestCombo = {
             maxGoodsProduced: 0,
             bestBaseOutpost: 0,
@@ -176,13 +171,13 @@ export const findBestOutpostCombination = (N, outposts) => {
         };
 
         for (let i = 0; i < N; i++) {
-            const newCombo = findBestComboForBase(i, N);
-            console.log(`For outpost ${i}: Best Combo Goods: ${newCombo.bestComboGoods}, Best Combo Outposts: ${newCombo.bestComboOutposts.join(', ')}, Best Combo Produced Goods: ${newCombo.bestComboProducedGoods.join(', ')}, Best Combo Unused Resources: ${newCombo.bestComboUnusedResources.join(', ')}`);
-            bestCombo = updateBestCombo(bestCombo, newCombo, outposts, i);
-        }
+            const newCombo = await dispatch(findBestComboForBase(i, N, outposts));
 
+            // Dispatching updateBestCombo as an action
+            bestCombo = await dispatch(updateBestCombo(bestCombo, newCombo, outposts, i));
+        }
         dispatch({
-            type: FIND_BEST_OUTPOST_COMBINATION,
+            type: 'FIND_BEST_OUTPOST_COMBINATION',
             payload: {
                 bestBaseOutpost: bestCombo.bestBaseOutpost,
                 bestLinkedOutposts: bestCombo.bestLinkedOutposts,
@@ -192,20 +187,19 @@ export const findBestOutpostCombination = (N, outposts) => {
         });
     };
 };
+
 export const findBestLinkedCombo = (i, j, N, outposts, previousResources, previousOutposts) => {
     return (dispatch) => {
         // Your existing function logic here...
         const memoKey = `${i}-${j}-${previousOutposts.join('-')}`;
 
         if (memo[memoKey]) {
-            console.log(`Using memoized result for key ${memoKey}...`);
             return memo[memoKey];
         }
 
         const producableGoods = getProducableGoods(previousResources);
         let comboResources = unusedResources(previousResources, getProducableGoods(previousResources));
 
-        console.log(`Finding best linked combo for base outpost ${i} and linked outpost ${j}...`);
 
         let bestComboGoods = producableGoods;
         let bestComboOutposts = [outposts[j].id];
@@ -240,6 +234,29 @@ export const findBestLinkedCombo = (i, j, N, outposts, previousResources, previo
         });
 
         return {bestComboGoods, bestComboOutposts, bestComboProducedGoods, bestComboUnusedResources};
+    };
+};
+export const calculate = (outposts, considerLinkingResources) => {
+    return (dispatch) => {
+        const N = outposts.length;
+        const {
+            bestBaseOutpost,
+            bestLinkedOutposts,
+            bestProducedGoods,
+            bestUnusedResources
+        } = findBestOutpostCombination(N);
+
+        const newResults = outposts.map(outpost => formatOutpostResult(outpost));
+
+        const finalResult = formatFinalResult(
+            bestBaseOutpost,
+            bestLinkedOutposts,
+            bestProducedGoods,
+            bestUnusedResources,
+            considerLinkingResources
+        );
+
+        dispatch(setResults([...newResults, ...finalResult]));
     };
 };
 

@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import Results from '../components/results';
 import {calculate} from "../redux/actions";
+import Calculate from "../components/calculate";
 
 const CalculateContainer = () => {
     const dispatch = useDispatch();
     const results = useSelector(state => state.results);
-    const [outposts, setOutposts] = useState([]);
-    const [considerLinkingResources, setConsiderLinkingResources] = useState(false);
+    const [outposts] = useState([]);
+    const [considerLinkingResources] = useState(false);
 
     const handleCalculate = () => {
         // Ensure outposts and considerLinkingResources are defined and valid
@@ -22,10 +22,10 @@ const CalculateContainer = () => {
     };
 
     return (
-        <div>
-            <button onClick={handleCalculate}>Calculate</button>
-            <Results data={results}/>
-        </div>
+        <Calculate
+            onCalculate={handleCalculate}
+            results={results}
+        />
     );
 };
 

@@ -1,16 +1,4 @@
 import resources from "../data/resourcesdata";
-import goods from "../data/goodsdata";
-
-
-const getProducableGoods = outpostResources => {
-    return Object.values(goods).filter(good => canProduceGood(outpostResources, good));
-};
-
-
-function unusedResources(outpostResources, producedGoods) {
-    return outpostResources.filter(res => !producedGoods.some(good => good.resources.some(r => r.name === res)));
-}
-
 
 
 function formatGoodNames(goodList) {
@@ -40,4 +28,4 @@ function formatResourceList(outpost, considerLinkingResources) {
     return filteredResources.map(formatResourceString).join("\n");
 }
 
-export {getProducableGoods, unusedResources, formatGoodNames, formatResourceList};
+export {formatGoodNames, formatResourceList};

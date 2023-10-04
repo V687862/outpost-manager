@@ -1,11 +1,10 @@
 import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {calculate} from "../redux/actions";
 import Calculate from "../components/calculate";
 
 const CalculateContainer = () => {
     const dispatch = useDispatch();
-    const results = useSelector(state => state.results);
     const [outposts] = useState([]);
     const [considerLinkingResources] = useState(false);
 
@@ -22,10 +21,7 @@ const CalculateContainer = () => {
     };
 
     return (
-        <Calculate
-            onCalculate={handleCalculate}
-            results={results}
-        />
+        <Calculate onCalculate={handleCalculate}/>
     );
 };
 

@@ -4,7 +4,8 @@ import {
     GET_OUTPOST_NAME,
     GET_OUTPOST_RESOURCES,
     REMOVE_OUTPOST,
-    TOGGLE_LINKING_RESOURCES
+    TOGGLE_LINKING_RESOURCES,
+    UPDATE_OUTPOST_RESOURCE
 } from "../actiontypes";
 
 const initialState = {
@@ -55,7 +56,22 @@ const outpostReducer = (state = initialState, action) => {
                 bestProducedGoods: action.payload.bestProducedGoods,
                 bestUnusedResources: action.payload.bestUnusedResources
             };
-
+        case UPDATE_OUTPOST_RESOURCE:
+            return {
+                ...state,
+                outposts: state.outposts.map(outpost =>
+                    outpost.id === action.payload.outpostId
+                        ? {
+                            ...outpost,
+                            resources: outpost.resources.map(resource =>
+                                resource.id === action.payload.resourceId
+                                    ? {...resource, value: action.payload.newValue}
+                                    : resource
+                            )
+                        }
+                        : outpost
+                )
+            };
         // ...other cases for different actions
         default:
             return state;

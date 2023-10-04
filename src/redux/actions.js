@@ -12,12 +12,12 @@ import {
     SET_RESULTS,
     TOGGLE_CONSIDER_LINKING_RESOURCES,
     UPDATE_BEST_COMBO,
-    UPDATE_OUTPOST_NAME
+    UPDATE_OUTPOST_NAME,
+    UPDATE_OUTPOST_RESOURCE
 } from './actiontypes';
 import {memo} from "react";
 import resources from "../data/resourcesdata";
 import goods from "../data/goodsdata";
-import {formatFinalResult, formatOutpostResult} from "../Utilities/outpostutils";
 
 export const addOutpost = (outpost) => ({
     type: ADD_OUTPOST,
@@ -110,6 +110,14 @@ export const getOutpostResources = (outpostId, outposts) => {
         });
     };
 };
+export const updateOutpostResource = (outpostId, resourceId, newValue) => ({
+    type: UPDATE_OUTPOST_RESOURCE,
+    payload: {
+        outpostId,
+        resourceId,
+        newValue
+    }
+});
 export const updateBestCombo = (bestCombo, newCombo, outposts, i) => {
     return (dispatch) => {
         const {bestComboGoods} = newCombo;
@@ -177,7 +185,7 @@ export const findBestOutpostCombination = (N, outposts) => {
             bestCombo = await dispatch(updateBestCombo(bestCombo, newCombo, outposts, i));
         }
         dispatch({
-            type: 'FIND_BEST_OUTPOST_COMBINATION',
+            type: FIND_BEST_OUTPOST_COMBINATION,
             payload: {
                 bestBaseOutpost: bestCombo.bestBaseOutpost,
                 bestLinkedOutposts: bestCombo.bestLinkedOutposts,

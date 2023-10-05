@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {canProduceGood, getOutpostName} from "../redux/actions";
 import {formatGoodNames} from "../Utilities/resourceutils";
+import PropTypes from "prop-types";
 
 const OutpostResultComponent = ({outpost}) => {
     const dispatch = useDispatch();
@@ -29,8 +30,10 @@ const OutpostResultComponent = ({outpost}) => {
     );
 };
 
-OutpostResultComponent.defaultProps = {
-    outpost: {},
+OutpostResultComponent.propTypes = {
+    outpost: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+    }).isRequired,
 };
 
 export default OutpostResultComponent;

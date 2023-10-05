@@ -1,10 +1,6 @@
 import resources from "../data/resourcesdata";
 
 
-function formatGoodNames(goodList) {
-    return goodList.map(g => g.name).join(", ");
-}
-
 function formatResourceList(outpost, considerLinkingResources) {
     const formatResourceString = (resourceString) => {
         let [code, name] = resourceString.split(" (");
@@ -28,4 +24,8 @@ function formatResourceList(outpost, considerLinkingResources) {
     return filteredResources.map(formatResourceString).join("\n");
 }
 
-export {formatGoodNames, formatResourceList};
+function formatGoodNames(goodList) {
+    return goodList.map(good => good.name).join(", ");
+}
+
+export {formatResourceList, formatGoodNames};

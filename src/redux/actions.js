@@ -245,27 +245,33 @@ export const findBestLinkedCombo = (i, j, N, outposts, previousResources, previo
     };
 };
 export const calculate = (outposts, considerLinkingResources) => {
-    return (dispatch) => {
-        const N = outposts.length;
-        const {
-            bestBaseOutpost,
-            bestLinkedOutposts,
-            bestProducedGoods,
-            bestUnusedResources
-        } = findBestOutpostCombination(N);
+    return async (dispatch) => {
+        try {
+            if (!Array.isArray(outposts) || typeof considerLinkingResources !== 'boolean') {
+                throw new Error('Invalid parameters passed to calculate action');
+            }
+            const {
+                bestBaseOutpost,
+                bestLinkedOutposts,
+                bestProducedGoods,
+                bestUnusedResources
+            } = await findBestOutpostCombination(outposts.length);
 
-        const newResults = outposts.map(outpost => formatOutpostResult(outpost));
-
-        const finalResult = formatFinalResult(
-            bestBaseOutpost,
-            bestLinkedOutposts,
-            bestProducedGoods,
-            bestUnusedResources,
-            considerLinkingResources
-        );
-
-        dispatch(setResults([...newResults, ...finalResult]));
+            // Dispatch results to Redux state
+            dispatch(setResults({
+                bestBaseOutpost,
+                bestLinkedOutposts,
+                bestProducedGoods,
+                bestUnusedResources,
+                considerLinkingResources,
+            }));
+        } catch (error) {
+            //... error handling
+        } finally {
+            dispatch(setError(error.toString()));
+        }
     };
 };
+
 
 

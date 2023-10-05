@@ -1,5 +1,5 @@
 import React from 'react';
-import {Provider, useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
     addOutpost,
     removeOutpost,
@@ -9,15 +9,15 @@ import {
 } from './redux/actions'; // Import your Redux actions
 import ResourceToggle from './components/resourcetoggle';
 import Controls from './components/controls';
-import resourcesdata from "./data/resourcesdata";
-import store from './redux/store';
 import CalculateContainer from "./containers/calculateContainer";
 import OutpostContainer from "./containers/outpostContainer";
 import FinalResultComponent from "./components/finalResults";
 import OutpostResultComponent from "./components/outpostResults";
 
 function App() {
-    const outposts = useSelector((state) => state.outposts);
+    const outposts = useSelector((state) => state.outpost?.outposts || []);
+
+
     const considerLinkingResources = useSelector((state) => state.considerLinkingResources);
     const dispatch = useDispatch();
     const handleNameChange = (outpostId, newName) => {
@@ -28,15 +28,11 @@ function App() {
         dispatch(updateOutpostResource(outpostId, resourceId, newValue));
     };
 
-    const yourResourcesArray = Object.keys(resourcesdata).map(key => ({
-        id: key,
-        name: resourcesdata[key].name,
-    }));
+
 
 
     return (
-        <Provider store={store}>
-            <div className="App">
+        <div className="App">
                 <Controls
                     onAddOutpost={() => dispatch(addOutpost())}
 
@@ -62,15 +58,15 @@ function App() {
                         }}>
                         <ResourceToggle
                             outpostId={outpost.id}
-                            resources={yourResourcesArray}
-                            onResourceChange={handleResourceChange}/>
+                            onResourceChange={handleResourceChange}
+                        />
                     </OutpostContainer>
                 ))}
                 <OutpostResultComponent></OutpostResultComponent>
                 <FinalResultComponent>
                 </FinalResultComponent>
             </div>
-        </Provider>
+
     );
 }
 export default App;

@@ -5,7 +5,7 @@ import resourceReducer from "./reducers/resourceReducer";
 
 
 const rootReducer = combineReducers({
-    outposts: outpostReducer,
+    outpost: outpostReducer,
     resources: resourceReducer,
     // ...other reducers for additional state properties
 });

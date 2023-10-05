@@ -11,6 +11,7 @@ import {
     REMOVE_OUTPOST,
     SET_ERROR,
     SET_LOADING,
+    SET_OUTPOSTS,
     SET_RESULTS,
     TOGGLE_CONSIDER_LINKING_RESOURCES,
     UPDATE_BEST_COMBO,
@@ -36,6 +37,10 @@ export const updateOutpostName = (outpostId, newName) => {
         payload: {outpostId, newName},
     };
 };
+export const setOutposts = (outposts) => ({
+    type: SET_OUTPOSTS,
+    payload: outposts,
+});
 export const setError = (error) => ({
     type: SET_ERROR,
     payload: error,

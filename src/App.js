@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Provider, useDispatch, useSelector} from 'react-redux';
 import {
     addOutpost,
@@ -9,17 +9,17 @@ import {
 } from './redux/actions'; // Import your Redux actions
 import ResourceToggle from './components/resourcetoggle';
 import Controls from './components/controls';
-import Results from './components/results';
 import resourcesdata from "./data/resourcesdata";
 import store from './redux/store';
 import CalculateContainer from "./containers/calculateContainer";
 import OutpostContainer from "./containers/outpostContainer";
+import FinalResultComponent from "./components/finalResults";
+import OutpostResultComponent from "./components/outpostResults";
 
 function App() {
     const outposts = useSelector((state) => state.outposts);
     const considerLinkingResources = useSelector((state) => state.considerLinkingResources);
     const dispatch = useDispatch();
-    const [results] = useState([]);
     const handleNameChange = (outpostId, newName) => {
         dispatch(updateOutpostName(outpostId, newName));
     };
@@ -40,7 +40,7 @@ function App() {
                 <Controls
                     onAddOutpost={() => dispatch(addOutpost())}
 
-                />
+                    onRemoveOutpost={() => dispatch(removeOutpost())}/>
                 <CalculateContainer/>
                 <label>
                     <input
@@ -66,7 +66,9 @@ function App() {
                             onResourceChange={handleResourceChange}/>
                     </OutpostContainer>
                 ))}
-                <Results results={results}/>
+                <OutpostResultComponent></OutpostResultComponent>
+                <FinalResultComponent>
+                </FinalResultComponent>
             </div>
         </Provider>
     );

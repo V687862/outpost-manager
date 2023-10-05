@@ -5,6 +5,7 @@ import {
     GET_OUTPOST_RESOURCES,
     REMOVE_OUTPOST,
     SET_ERROR,
+    SET_LOADING,
     TOGGLE_LINKING_RESOURCES,
     UPDATE_OUTPOST_RESOURCE
 } from "../actiontypes";
@@ -77,6 +78,11 @@ const outpostReducer = (state = initialState, action) => {
             return {
                 ...state,
                 error: action.payload,
+            };
+        case SET_LOADING:
+            return {
+                ...state,
+                isLoading: action.payload,
             };
 
         // ...other cases for different actions

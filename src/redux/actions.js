@@ -9,6 +9,8 @@ import {
     GET_PRODUCABLE_GOODS,
     GET_UNUSED_RESOURCES,
     REMOVE_OUTPOST,
+    SET_ERROR,
+    SET_LOADING,
     SET_RESULTS,
     TOGGLE_CONSIDER_LINKING_RESOURCES,
     UPDATE_BEST_COMBO,
@@ -34,6 +36,14 @@ export const updateOutpostName = (outpostId, newName) => {
         payload: {outpostId, newName},
     };
 };
+export const setError = (error) => ({
+    type: SET_ERROR,
+    payload: error,
+});
+export const setLoading = (isLoading) => ({
+    type: SET_LOADING,
+    payload: isLoading,
+});
 export const toggleConsiderLinkingResources = () => ({
     type: TOGGLE_CONSIDER_LINKING_RESOURCES,
 });
@@ -266,9 +276,9 @@ export const calculate = (outposts, considerLinkingResources) => {
                 considerLinkingResources,
             }));
         } catch (error) {
-            //... error handling
+            dispatch(setError(error.toString()));//... error handling
         } finally {
-            dispatch(setError(error.toString()));
+            dispatch(setLoading(false));
         }
     };
 };

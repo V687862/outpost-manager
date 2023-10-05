@@ -4,7 +4,10 @@ import {canProduceGood, getOutpostName} from "../redux/actions";
 import {formatGoodNames} from "../Utilities/resourceutils"; // or utils
 
 const OutpostResultComponent = ({outpost}) => {
-    const outpostName = useSelector(state => getOutpostName(state, outpost.id));
+    const outpostName = useSelector(state => {
+        console.log('State:', state);
+        return getOutpostName(state, outpost?.id);
+    });
     const manufacturableGoods = useSelector(state => {
         canProduceGood(state, outpost.id)
     });
@@ -18,4 +21,8 @@ const OutpostResultComponent = ({outpost}) => {
         </div>
     );
 };
+OutpostResultComponent.defaultProps = {
+    outpost: {},
+};
+
 export default OutpostResultComponent;

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Outpost from './components/outpost';
 import ResourceToggle from './components/resourcetoggle';
-import ResourceList from './components/resourcelist';
 import Controls from './components/controls';
 import Results from './components/results';
 import { addOutpost, removeOutpost, calculate } from './Utilities/outpostutils';
@@ -9,7 +8,7 @@ import { addOutpost, removeOutpost, calculate } from './Utilities/outpostutils';
 function App() {
     const [outposts, setOutposts] = useState([]);
     const [results, setResults] = useState([]);
-    const [considerLinkingResources, _setConsiderLinkingResources] = useState(false);  // prefixed with underscore
+    const [considerLinkingResources] = useState(false);  // prefixed with underscore
 
     const handleResourceChange = (outpostId, resourceName, isChecked) => {
         setOutposts(prev => prev.map(outpost => {
@@ -32,12 +31,17 @@ function App() {
         }));
     };
 
+    const toggleConsiderLinkingResources = () => {
+        setConsiderLinkingResources(prev => !prev);
+    };
+
     return (
         <div className="App">
             <Controls
                 onAddOutpost={() => addOutpost(outposts, setOutposts)}
                 onCalculate={() => calculate(outposts, considerLinkingResources, setResults)}
             />
+            <ResourceToggle toggleConsiderLinkingResources={toggleConsiderLinkingResources} />
             {outposts.map(outpost => (
                 <Outpost
                     key={outpost.id}
@@ -47,17 +51,9 @@ function App() {
                     onNameChange={handleNameChange}
                     onRemove={() => removeOutpost(outpost.id, outposts, setOutposts)}
                     considerLinkingResources={considerLinkingResources}
-                >
-                    {/* Embed the ResourceToggle component within each Outpost component */}
-                    <ResourceToggle
-                        outpostId={outpost.id}  // added outpostId prop
-                        onResourceChange={(resourceName, isChecked) => handleResourceChange(outpost.id, resourceName, isChecked)}  // added onResourceChange prop
-                    />
-                </Outpost>
+                 resources={''}/>
             ))}
-            <Results results={results} />  {/* updated prop name to results */}
-            {/* Optional: Render the ResourceList component if you have a use for it */}
-            <ResourceList resources={} />  {/* assuming resources is an object */}
+            <Results results={results} />
         </div>
     );
 }

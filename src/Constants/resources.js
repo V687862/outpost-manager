@@ -45,4 +45,3 @@ export const ROTHICITE = '(Rt) Rothicite';
 export const TASINE = '(Ts) Tasine';
 export const VERYL = '(Vy) Veryl';
 export const VYTINIUM = '(Vt) Vytinium';
-

@@ -1,12 +1,16 @@
 import React from 'react';
+import { UseResourceToggle } from './resourcetogglecontext';
 import PropTypes from 'prop-types';
 
-function ResourceList({ resources }) {
+const ResourceList = ({ resources }) => {
+    const { considerLinking } = UseResourceToggle();
+    const filteredResources = resources.filter(resource => resource.isLinkResource === considerLinking);
+
     return (
         <div className="resource-list">
             <h3>Resources:</h3>
             <ul>
-                {resources.map((resource, index) => (
+                {filteredResources.map((resource, index) => (
                     <li key={index}>
                         {resource.name}
                         {resource.isLinkResource ? ' (Linking Resource)' : ' (Manufacturing Resource)'}
@@ -15,7 +19,7 @@ function ResourceList({ resources }) {
             </ul>
         </div>
     );
-}
+};
 
 ResourceList.propTypes = {
     resources: PropTypes.arrayOf(

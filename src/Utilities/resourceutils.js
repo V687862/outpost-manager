@@ -1,5 +1,46 @@
 import resources from "../data/resourcesdata";
+import goods from "../data/goodsdata";
 
+const handleResourceToggle = (outpostId, resourceName, setOutposts) => {
+    setOutposts(prev => prev.map(outpost => {
+        if (outpost.id === outpostId) {
+            const updatedResources = outpost.resources.includes(resourceName) ? outpost.resources.filter(r => r !== resourceName) : [...outpost.resources, resourceName];
+            return { ...outpost, resources: updatedResources };
+        }
+        return outpost;
+    }));
+};
+const canProduceGood = (outpostResources, good, considerLinkingResources) => {
+    return good.resources.every(resourceOrGood => {
+        const isResource = resources[resourceOrGood.name];
+        const isGood = goods[resourceOrGood.name];
+
+        if (isResource) {
+            return (considerLinkingResources || !resourceOrGood.isLinkResource) && outpostResources.includes(resourceOrGood.name);
+        } else if (isGood) {
+            return canProduceGood(outpostResources, goods[resourceOrGood.name]);
+        } else {
+            console.warn(`Unknown type for ${resourceOrGood.name}`);
+            return false;  // or handle this case as appropriate for your logic
+        }
+    });
+};
+
+const getProducableGoods = outpostResources => {
+    let considerLinkingResources;
+    return Object.values(goods).filter(good => canProduceGood(outpostResources, good, considerLinkingResources));
+};
+
+
+function unusedResources(outpostResources, producedGoods) {
+    return outpostResources.filter(res => !producedGoods.some(good => good.resources.some(r => r.name === res)));
+}
+
+
+
+function formatGoodNames(goodList) {
+    return goodList.map(g => g.name).join(", ");
+}
 
 function formatResourceList(outpost, considerLinkingResources) {
     const formatResourceString = (resourceString) => {
@@ -24,8 +65,4 @@ function formatResourceList(outpost, considerLinkingResources) {
     return filteredResources.map(formatResourceString).join("\n");
 }
 
-function formatGoodNames(goodList) {
-    return goodList.map(good => good.name).join(", ");
-}
-
-export {formatResourceList, formatGoodNames};
+export { handleResourceToggle, canProduceGood, getProducableGoods, unusedResources, formatGoodNames, formatResourceList };

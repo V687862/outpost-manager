@@ -1,11 +1,10 @@
 import React from 'react';
-import resources from '../data/resourcesdata';
-import PropTypes from "prop-types";
+import { UseResourceToggle } from './resourcetogglecontext';
+import PropTypes from 'prop-types';
 
-function Outpost({ id, name, onResourceChange, onNameChange, considerLinkingResources,onRemove }) {
-    // Divide resources into linking and manufacturing
-    const resourcesKeys = Object.keys(resources).filter(key => resources[key].isLinkResource);
-    const manufacturingResourcesKeys = Object.keys(resources).filter(key => !resources[key].isLinkResource);
+const Outpost = ({ id, name, resources, onResourceChange, onNameChange, onRemove, children }) => {
+    const { considerLinking } = UseResourceToggle();
+    const filteredResources = resources.filter(resource => resource.isLinkResource === considerLinking);
 
     return (
         <div className="outpost">
@@ -18,50 +17,40 @@ function Outpost({ id, name, onResourceChange, onNameChange, considerLinkingReso
                 onChange={(e) => onNameChange(id, e.target.value)}
             />
 
-            <h3>Manufacturing Resources:</h3>
-            {manufacturingResourcesKeys.map(resourceKey => (
-                <div key={resourceKey}>
+            <h3>Resources:</h3>
+            {filteredResources.map((resource, index) => (
+                <div key={index}>
                     <input
                         type="checkbox"
-                        id={`${resourceKey}-outpost${id}`}
-                        onChange={(e) => onResourceChange(id, resourceKey, e.target.checked)}
+                        id={`${resource.name}-outpost${id}`}
+                        onChange={(e) => onResourceChange(id, resource.name, e.target.checked)}
                     />
-                    <label htmlFor={`${resourceKey}-outpost${id}`}>{resources[resourceKey].name}</label>
+                    <label htmlFor={`${resource.name}-outpost${id}`}>{resource.name}</label>
                 </div>
             ))}
 
-            {considerLinkingResources && (
-                <>
-                    <h3>Resources:</h3>
-                    {resourcesKeys.map(resourceKey => (
-                        <div key={resourceKey}>
-                            <input
-                                type="checkbox"
-                                id={`${resourceKey}-outpost${id}`}
-                                onChange={(e) => onResourceChange(id, resourceKey, e.target.checked)}
-                                value={resourceKey}
-                            />
-                            <label htmlFor={`${resourceKey}-outpost${id}-linking`}>{resources[resourceKey].name}</label>
-                        </div>
-                    ))}
-                </>
-            )}
-            {/* Conditionally render the remove button based on whether it's the first outpost */}
             {id !== 1 && <button onClick={() => onRemove(id)}>Remove Outpost</button>}
+            {children}
         </div>
     );
-}
+};
+
 Outpost.propTypes = {
     id: PropTypes.number.isRequired,
     name: PropTypes.string,
+    resources: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            isLinkResource: PropTypes.bool
+        })
+    ).isRequired,
     onResourceChange: PropTypes.func.isRequired,
     onNameChange: PropTypes.func.isRequired,
-    considerLinkingResources: PropTypes.bool,
     onRemove: PropTypes.func.isRequired,
 };
+
 Outpost.defaultProps = {
     name: '',
-    considerLinkingResources: false,
 };
-export default Outpost;
 
+export default Outpost;

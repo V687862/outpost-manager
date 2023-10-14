@@ -1,72 +1,61 @@
-import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {
-    addOutpost,
-    removeOutpost,
-    toggleConsiderLinkingResources,
-    updateOutpostName,
-    updateOutpostResource
-} from './redux/actions'; // Import your Redux actions
+import React, { useState } from 'react';
+import Outpost from './components/outpost';
 import ResourceToggle from './components/resourcetoggle';
 import Controls from './components/controls';
-import CalculateContainer from "./containers/calculateContainer";
-import OutpostContainer from "./containers/outpostContainer";
-import FinalResultComponent from "./components/finalResults";
-import OutpostResultComponent from "./components/outpostResults";
+import Results from './components/results';
+import { addOutpost, removeOutpost, calculate } from './Utilities/outpostutils';
 
 function App() {
-    const outposts = useSelector((state) => state.outpost?.outposts || []);
+    const [outposts, setOutposts] = useState([]);
+    const [results, setResults] = useState([]);
+    const [considerLinkingResources] = useState(false);  // prefixed with underscore
 
+    const handleResourceChange = (outpostId, resourceName, isChecked) => {
+        setOutposts(prev => prev.map(outpost => {
+            if (outpost.id === outpostId) {
+                const updatedResources = isChecked ?
+                    [...outpost.resources, resourceName] :
+                    outpost.resources.filter(resource => resource !== resourceName);
+                return { ...outpost, resources: updatedResources };
+            }
+            return outpost;
+        }));
+    };
 
-    const considerLinkingResources = useSelector((state) => state.considerLinkingResources);
-    const dispatch = useDispatch();
     const handleNameChange = (outpostId, newName) => {
-        dispatch(updateOutpostName(outpostId, newName));
+        setOutposts(prev => prev.map(outpost => {
+            if (outpost.id === outpostId) {
+                return { ...outpost, name: newName };
+            }
+            return outpost;
+        }));
     };
 
-    const handleResourceChange = (outpostId, resourceId, newValue) => {
-        dispatch(updateOutpostResource(outpostId, resourceId, newValue));
+    const toggleConsiderLinkingResources = () => {
+        setConsiderLinkingResources(prev => !prev);
     };
-
-
-
 
     return (
         <div className="App">
-                <Controls
-                    onAddOutpost={() => dispatch(addOutpost())}
-
-                    onRemoveOutpost={() => dispatch(removeOutpost())}/>
-                <CalculateContainer/>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={considerLinkingResources}
-                        onChange={() => dispatch(toggleConsiderLinkingResources())}
-                    />
-                    Consider Linking Resources
-                </label>
-                {outposts.map(outpost => (
-                    <OutpostContainer
-                        key={outpost.id}
-                        id={outpost.id}
-                        name={outpost.name}
-                        onNameChange={handleNameChange}
-                        onRemove={() => dispatch(removeOutpost(outpost.id))}
-                        considerLinkingResources={considerLinkingResources}
-                        onResourceChange={() => {
-                        }}>
-                        <ResourceToggle
-                            outpostId={outpost.id}
-                            onResourceChange={handleResourceChange}
-                        />
-                    </OutpostContainer>
-                ))}
-                <OutpostResultComponent></OutpostResultComponent>
-                <FinalResultComponent>
-                </FinalResultComponent>
-            </div>
-
+            <Controls
+                onAddOutpost={() => addOutpost(outposts, setOutposts)}
+                onCalculate={() => calculate(outposts, considerLinkingResources, setResults)}
+            />
+            <ResourceToggle toggleConsiderLinkingResources={toggleConsiderLinkingResources} />
+            {outposts.map(outpost => (
+                <Outpost
+                    key={outpost.id}
+                    id={outpost.id}
+                    name={outpost.name}
+                    onResourceChange={handleResourceChange}
+                    onNameChange={handleNameChange}
+                    onRemove={() => removeOutpost(outpost.id, outposts, setOutposts)}
+                    considerLinkingResources={considerLinkingResources}
+                    resources={''}/>
+            ))}
+            <Results results={results} />
+        </div>
     );
 }
+
 export default App;

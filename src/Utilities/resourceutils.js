@@ -27,7 +27,8 @@ const canProduceGood = (outpostResources, good, considerLinkingResources) => {
 };
 
 const getProducableGoods = outpostResources => {
-    return Object.values(goods).filter(good => canProduceGood(outpostResources, good));
+    let considerLinkingResources;
+    return Object.values(goods).filter(good => canProduceGood(outpostResources, good, considerLinkingResources));
 };
 
 

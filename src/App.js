@@ -5,7 +5,6 @@ import ResourceList from './components/resourcelist';
 import Controls from './components/controls';
 import Results from './components/results';
 import { addOutpost, removeOutpost, calculate } from './Utilities/outpostutils';
-import resourcesdata from "./data/resourcesdata";
 
 function App() {
     const [outposts, setOutposts] = useState([]);
@@ -58,7 +57,7 @@ function App() {
             ))}
             <Results results={results} />  {/* updated prop name to results */}
             {/* Optional: Render the ResourceList component if you have a use for it */}
-            <ResourceList resources={{}} />  {/* assuming resources is an object */}
+            <ResourceList resources={} />  {/* assuming resources is an object */}
         </div>
     );
 }

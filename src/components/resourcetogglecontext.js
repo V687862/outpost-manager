@@ -7,10 +7,10 @@ export const UseResourceToggle = () => {
 };
 
 export const ResourceToggleProvider = ({ children }) => {
-    const [considerLinking, setConsiderLinking] = useState(false);
+    const [considerLinkingResources, setConsiderLinkingResources] = useState(false);
 
     return (
-        <ResourceToggleContext.Provider value={{ considerLinking, setConsiderLinking }}>
+        <ResourceToggleContext.Provider value={{ considerLinkingResources, setConsiderLinkingResources }}>
             {children}
         </ResourceToggleContext.Provider>
     );

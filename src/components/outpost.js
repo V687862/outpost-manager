@@ -2,7 +2,7 @@ import React from 'react';
 import { UseResourceToggle } from './resourcetogglecontext';
 import PropTypes from 'prop-types';
 
-const Outpost = ({ id, name, resources, onResourceChange, onNameChange, onRemove }) => {
+const Outpost = ({ id, name, resources, onResourceChange, onNameChange, onRemove, children }) => {
     const { considerLinking } = UseResourceToggle();
     const filteredResources = resources.filter(resource => resource.isLinkResource === considerLinking);
 
@@ -30,6 +30,7 @@ const Outpost = ({ id, name, resources, onResourceChange, onNameChange, onRemove
             ))}
 
             {id !== 1 && <button onClick={() => onRemove(id)}>Remove Outpost</button>}
+            {children}
         </div>
     );
 };
